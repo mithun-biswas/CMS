@@ -39,6 +39,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EPPlus">
+      <HintPath>..\packages\EPPlus.4.0.5\lib\net20\EPPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="itextsharp">
+      <HintPath>..\packages\iTextSharp.5.5.9\lib\itextsharp.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -264,6 +270,13 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Images\img1.jpg" />
+    <Content Include="Images\img2.jpg" />
+    <Content Include="Images\img3.jpg" />
+    <Content Include="Images\Mithun.jpg" />
+    <Content Include="Images\Nuha.jpg" />
+    <Content Include="Images\UlabLogo.gif" />
+    <Content Include="Images\UniFavicon.png" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <None Include="Scripts\jquery-2.2.3.intellisense.js" />
@@ -326,6 +339,10 @@
     <Content Include="Views\UserAccount\Index.cshtml" />
     <Content Include="Views\UserAccount\Login.cshtml" />
     <Content Include="Views\UserAccount\Registrar.cshtml" />
+    <Content Include="Views\Teacher\FullTimeFacultyCourseLoadReport.cshtml" />
+    <Content Include="Views\Teacher\FullTimeFacultyCourseLoadReportExcel.cshtml" />
+    <Content Include="Views\Teacher\PartTimeFacultyCourseLoadReport.cshtml" />
+    <Content Include="Views\Teacher\PartTimeFacultyCourseLoadReportExcel.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

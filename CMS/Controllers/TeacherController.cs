@@ -9,7 +9,11 @@ using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using CMS.Models;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 using Microsoft.Ajax.Utilities;
+using OfficeOpenXml;
+using System.IO;
 
 namespace CMS.Controllers
 {
@@ -85,6 +89,153 @@ namespace CMS.Controllers
             return View(teacherStatisticsesWithDesignationOrder);
         }
 
+        public ActionResult FullTimeFacultyCourseLoadReport()
+        {
+            var document = new Document(PageSize.A4, 100, 100, 50, 50);
+            var output = new MemoryStream();
+            var writer = PdfWriter.GetInstance(document, output);
+            document.Open();
+
+
+            var titleFont = FontFactory.GetFont("Arial", 18, Font.BOLD);
+            var subTitleFont = FontFactory.GetFont("Arial", 14, Font.BOLD);
+            var boldTableFont = FontFactory.GetFont("Arial", 12, Font.BOLD);
+            var endingMessageFont = FontFactory.GetFont("Arial", 10, Font.ITALIC);
+            var bodyFont = FontFactory.GetFont("Arial", 8, Font.NORMAL);
+
+            document.Add(new Paragraph("Full Time Faculty Course Load ", titleFont));
+            document.Add(new Paragraph("Fall 2016 ", bodyFont));
+            document.Add(new Paragraph("Department of Computer Science and Engineering ", bodyFont));
+
+            document.Add(Chunk.NEWLINE);
+
+
+            var teacherTable = new PdfPTable(4);
+            //teacherTable.HorizontalAlignment = 0;
+            //teacherTable.SpacingBefore = 10;
+            //teacherTable.SpacingAfter = 10;
+            //teacherTable.DefaultCell.Border = 1;
+            //teacherTable.TotalWidth = 9f;
+            int[] widths = new int[] { 20, 22, 10, 50 };
+            teacherTable.SetWidths(widths);
+
+            teacherTable.AddCell(new Phrase("Name", boldTableFont));
+            teacherTable.AddCell(new Phrase("Designation", boldTableFont));
+            teacherTable.AddCell(new Phrase("No of Co", boldTableFont));
+            teacherTable.AddCell(new Phrase("Courses", boldTableFont));
+
+            var teacherStatistics = (from t in db.Teachers
+                                     join c in db.Courses
+                                         on t.Id equals c.TeacherId into cGroup
+                                     where t.Status == "Full Time"
+                                     orderby t.Designation descending
+                                     select new
+                                     {
+                                         TeacherInfo = t,
+                                         CourseInfo = from cg in cGroup
+                                                      orderby cg.Code ascending
+                                                      select cg
+                                     }).ToList();
+
+            List<TeacherStatistics> teacherStatisticses = new List<TeacherStatistics>();
+            int count = 0;
+            foreach (var teacherStatistic in teacherStatistics)
+            {
+                TeacherStatistics aTeacherStatistics = new TeacherStatistics();
+                aTeacherStatistics.Name = teacherStatistic.TeacherInfo.Name;
+                aTeacherStatistics.Designation = teacherStatistic.TeacherInfo.Designation;
+                aTeacherStatistics.NumberOfCourse = teacherStatistic.TeacherInfo.NumberOfCourse;
+                count = 0;
+                foreach (var courseInfo in teacherStatistic.CourseInfo)
+                {
+                    if (count != 0)
+                    {
+                        aTeacherStatistics.Courses += ", ";
+                    }
+
+                    aTeacherStatistics.Courses += courseInfo.Code;
+                    aTeacherStatistics.Courses += "(";
+                    aTeacherStatistics.Courses += courseInfo.Section;
+                    aTeacherStatistics.Courses += ")";
+                    count++;
+                }
+                teacherTable.AddCell(aTeacherStatistics.Name);
+                teacherTable.AddCell(aTeacherStatistics.Designation);
+                teacherTable.AddCell(aTeacherStatistics.NumberOfCourse.ToString());
+                teacherTable.AddCell(aTeacherStatistics.Courses);
+
+
+                teacherStatisticses.Add(aTeacherStatistics);
+            }
+            document.Add(teacherTable);
+            document.Close();
+            Response.ContentType = "application/pdf";
+            Response.AddHeader("content-disposition", "attachment;  filename=FullTimeFaculty.pdf");
+
+            Response.BinaryWrite(output.ToArray());
+
+            return View(teacherStatisticses);
+        }
+
+        public ActionResult FullTimeFacultyCourseLoadReportExcel()
+        {
+
+            var teacherStatistics = (from t in db.Teachers
+                                     join c in db.Courses
+                                         on t.Id equals c.TeacherId into cGroup
+                                     where t.Status == "Full Time"
+                                     orderby t.Designation descending
+                                     select new
+                                     {
+                                         TeacherInfo = t,
+                                         CourseInfo = from cg in cGroup
+                                                      orderby cg.Code ascending
+                                                      select cg
+                                     }).ToList();
+
+
+            List<TeacherStatistics> teacherStatisticses = new List<TeacherStatistics>();
+            int count = 0;
+            foreach (var teacherStatistic in teacherStatistics)
+            {
+                TeacherStatistics aTeacherStatistics = new TeacherStatistics();
+                aTeacherStatistics.Name = teacherStatistic.TeacherInfo.Name;
+                aTeacherStatistics.Designation = teacherStatistic.TeacherInfo.Designation;
+                aTeacherStatistics.NumberOfCourse = teacherStatistic.TeacherInfo.NumberOfCourse;
+                count = 0;
+                foreach (var courseInfo in teacherStatistic.CourseInfo)
+                {
+                    if (count != 0)
+                    {
+                        aTeacherStatistics.Courses += ", ";
+                    }
+
+                    aTeacherStatistics.Courses += courseInfo.Code;
+                    aTeacherStatistics.Courses += "(";
+                    aTeacherStatistics.Courses += courseInfo.Section;
+                    aTeacherStatistics.Courses += ")";
+                    count++;
+                }
+                teacherStatisticses.Add(aTeacherStatistics);
+            }
+
+            ExcelPackage excel = new ExcelPackage();
+            var workSheet = excel.Workbook.Worksheets.Add("Sheet1");
+            workSheet.Cells[1, 1].LoadFromCollection(teacherStatisticses, true);
+            using (var memoryStream = new MemoryStream())
+            {
+                Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                Response.AddHeader("content-disposition", "attachment;  filename=teacher.xlsx");
+                excel.SaveAs(memoryStream);
+                memoryStream.WriteTo(Response.OutputStream);
+                Response.Flush();
+                Response.End();
+            }
+
+            return View(teacherStatisticses);
+        }
+
+
         public ActionResult PartTimeFacultyCourseLoad()
         {
             if (Session["user_email"] == null)
@@ -148,6 +299,161 @@ namespace CMS.Controllers
 
             return View(teacherStatisticsesWithDesignationOrder);
         }
+
+
+        public ActionResult PartTimeFacultyCourseLoadReport()
+        {
+            var document = new Document(PageSize.A4, 50, 50, 25, 25);
+            var output = new MemoryStream();
+            var writer = PdfWriter.GetInstance(document, output);
+            document.Open();
+
+
+            var titleFont = FontFactory.GetFont("Arial", 18, Font.BOLD);
+            var subTitleFont = FontFactory.GetFont("Arial", 14, Font.BOLD);
+            var boldTableFont = FontFactory.GetFont("Arial", 12, Font.BOLD);
+            var endingMessageFont = FontFactory.GetFont("Arial", 10, Font.ITALIC);
+            var bodyFont = FontFactory.GetFont("Arial", 12, Font.NORMAL);
+          
+
+            document.Add(new Paragraph("Part Time Faculty Course Load ", titleFont));
+            document.Add(new Paragraph("Fall 2016", bodyFont));
+            document.Add(new Paragraph("Department of Computer Science and Engineering ", bodyFont));
+
+            document.Add(Chunk.NEWLINE);
+
+
+            var teacherTable = new PdfPTable(4);
+            //teacherTable.HorizontalAlignment = 0;
+            teacherTable.SpacingBefore = 10;
+            teacherTable.SpacingAfter = 10;
+            //teacherTable.DefaultCell.Border = 1;
+            teacherTable.TotalWidth = 9f;
+
+            int[] widths = new int[] { 20, 22, 10, 35 };
+            teacherTable.SetWidths(widths);
+
+
+            teacherTable.AddCell(new Phrase("Name", boldTableFont));
+            teacherTable.AddCell(new Phrase("Designation", boldTableFont));
+            teacherTable.AddCell(new Phrase("No. of Co", boldTableFont));
+            teacherTable.AddCell(new Phrase("Courses", boldTableFont));
+
+
+            var teacherStatistics = (from t in db.Teachers
+                                     join c in db.Courses
+                                         on t.Id equals c.TeacherId into cGroup
+                                     where t.Status == "Part Time"
+                                     orderby t.Designation descending
+                                     select new
+                                     {
+                                         TeacherInfo = t,
+                                         CourseInfo = from cg in cGroup
+                                                      orderby cg.Code ascending
+                                                      select cg
+                                     }).ToList();
+
+            List<TeacherStatistics> teacherStatisticses = new List<TeacherStatistics>();
+
+            int count = 0;
+            foreach (var teacherStatistic in teacherStatistics)
+            {
+                TeacherStatistics aTeacherStatistics = new TeacherStatistics();
+                aTeacherStatistics.Name = teacherStatistic.TeacherInfo.Name;
+                aTeacherStatistics.Designation = teacherStatistic.TeacherInfo.Designation;
+                aTeacherStatistics.NumberOfCourse = teacherStatistic.TeacherInfo.NumberOfCourse;
+
+                count = 0;
+                foreach (var courseInfo in teacherStatistic.CourseInfo)
+                {
+                    if (count != 0)
+                    {
+                        aTeacherStatistics.Courses += ", ";
+                    }
+
+                    aTeacherStatistics.Courses += courseInfo.Code;
+                    aTeacherStatistics.Courses += "(";
+                    aTeacherStatistics.Courses += courseInfo.Section;
+                    aTeacherStatistics.Courses += ")";
+                    count++;
+                }
+
+                teacherTable.AddCell(aTeacherStatistics.Name);
+                teacherTable.AddCell(aTeacherStatistics.Designation);
+                teacherTable.AddCell(aTeacherStatistics.NumberOfCourse.ToString());
+                teacherTable.AddCell(aTeacherStatistics.Courses);
+
+                teacherStatisticses.Add(aTeacherStatistics);
+            }
+
+            document.Add(teacherTable);
+            document.Close();
+            Response.ContentType = "application/pdf";
+            Response.AddHeader("content-disposition", "attachment;  filename=PartTimeFaculty.pdf");
+
+            Response.BinaryWrite(output.ToArray());
+
+            return View(teacherStatisticses);
+
+        }
+        public ActionResult PartTimeFacultyCourseLoadReportExcel()
+        {
+            var teacherStatistics = (from t in db.Teachers
+                                     join c in db.Courses
+                                         on t.Id equals c.TeacherId into cGroup
+                                     where t.Status == "Part Time"
+                                     orderby t.Designation descending
+                                     select new
+                                     {
+                                         TeacherInfo = t,
+                                         CourseInfo = from cg in cGroup
+                                                      orderby cg.Code ascending
+                                                      select cg
+                                     }).ToList();
+
+            List<TeacherStatistics> teacherStatisticses = new List<TeacherStatistics>();
+            int count = 0;
+            foreach (var teacherStatistic in teacherStatistics)
+            {
+                TeacherStatistics aTeacherStatistics = new TeacherStatistics();
+                aTeacherStatistics.Name = teacherStatistic.TeacherInfo.Name;
+                aTeacherStatistics.Designation = teacherStatistic.TeacherInfo.Designation;
+                aTeacherStatistics.NumberOfCourse = teacherStatistic.TeacherInfo.NumberOfCourse;
+                count = 0;
+                foreach (var courseInfo in teacherStatistic.CourseInfo)
+                {
+                    if (count != 0)
+                    {
+                        aTeacherStatistics.Courses += ", ";
+                    }
+
+                    aTeacherStatistics.Courses += courseInfo.Code;
+                    aTeacherStatistics.Courses += "(";
+                    aTeacherStatistics.Courses += courseInfo.Section;
+                    aTeacherStatistics.Courses += ")";
+                    count++;
+                }
+
+                teacherStatisticses.Add(aTeacherStatistics);
+            }
+
+            ExcelPackage excel = new ExcelPackage();
+            var workSheet = excel.Workbook.Worksheets.Add("Sheet1");
+            workSheet.Cells[1, 1].LoadFromCollection(teacherStatisticses, true);
+            using (var memoryStream = new MemoryStream())
+            {
+                Response.ContentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                Response.AddHeader("content-disposition", "attachment;  filename=teacher.xlsx");
+                excel.SaveAs(memoryStream);
+                memoryStream.WriteTo(Response.OutputStream);
+                Response.Flush();
+                Response.End();
+            }
+
+            return View(teacherStatisticses);
+        }
+
+       
         public ActionResult Index()
         {
             if (Session["user_email"] == null)

@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = "FullTimeFacultyCourseLoad";
 }
-<div id="customers">
+<div id="FullTime">
     <h2>FullTimeFacultyCourseLoad</h2>
 
     <table class="table form-group" id="fullTimeFaculty">
@@ -42,7 +42,9 @@
 
     </table>
 </div>
-<a href="javascript:genPDF()">Download pdf</a>
+
+
+@*<a href="javascript:genPDF()">Download pdf</a>
 <button onclick="printContent('customers')">Print Content</button>
 
 <input type="button" id="excel" name="excel" value="Save as excel" class="form-control"/>
@@ -68,4 +70,31 @@
         });
 
     </script>
-}
+}*@
+
+
+<div>
+    @Html.ActionLink("Get PDF", "FullTimeFacultyCourseLoadReport")
+</div>
+
+
+<div>
+    @Html.ActionLink("Get Excel", "FullTimeFacultyCourseLoadReportExcel")
+</div>
+
+
+<div>
+
+    <a href="#" onclick="return xepOnline.Formatter.Format('FullTime',{render:'download'});">
+        Save as PDF (With Script)
+    </a>
+
+    @section Scripts {
+
+        <script type="text/javascript" src="~/Scripts/jquery-2.2.3.js"></script>
+        <script src="~/Scripts/xepOnline.jqPlugin.js"></script>
+
+    }
+
+
+</div>

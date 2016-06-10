@@ -4,6 +4,106 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - Course Management System</title>
+    <link rel="shortcut icon" type="image/ico" href="~/Images/UniFavicon.png">
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <style>
+        label.error {
+            color: tomato;
+            font-weight: normal;
+        }
+
+        #main {
+            width: 100%;
+            height: 5%;
+            font-family: Fira Sans;
+        }
+    </style>
+
+</head>
+<body>
+
+
+    <div class="navbar navbar-inverse navbar-fixed-top" id="main">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Course Management System", "Index", "Home", null, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse navbar-right">
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li style="margin-top: 0px;"><a href="@Url.Action("Index", "Home")" class="glyphicon glyphicon-home"></a></li>
+                        <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Course <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>@Html.ActionLink("Save Course", "Create", "Course")</li>
+                                <li>@Html.ActionLink("Course Assign To Faculty", "CourseAssignToTeacher", "Course")</li>
+                                <li>@Html.ActionLink("View Course Statistics", "Index", "Course")</li>
+                                <li class="divider"></li>
+                                <li>@Html.ActionLink("Unassign All Courses", "Index", "Course")</li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Teacher <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>@Html.ActionLink("Save Faculty", "Create", "Teacher")</li>
+                                <li>@Html.ActionLink("View All Faculty", "Index", "Teacher")</li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Report <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+
+                                <li>@Html.ActionLink("H&R Report for Full-Time Faculty", "FullTimeFacultyCourseLoad", "Teacher")</li>
+                                <li>@Html.ActionLink("H&R Report for Part-Time Faculty", "PartTimeFacultyCourseLoad", "Teacher")</li>
+                                <li>@Html.ActionLink("Registrar Report", "RegistrarReport", "Course")</li>
+                            </ul>
+                        </li>
+
+
+                    </ul>
+                    @Html.Partial("_LoginPartial")
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer style="font-family: Fira Sans">
+            <p>&copy; @DateTime.Now.Year - All Rights Reserved by ULAB</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <script>
+        $('.dropdown').hover(function () {
+            $('.dropdown-toggle', this).trigger('click');
+        });
+    </script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>
+
+
+
+
+@*<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Course Management System</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     <style>
@@ -52,4 +152,4 @@
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
 </body>
-</html>
+</html>*@
