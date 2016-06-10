@@ -1,0 +1,84 @@
+﻿@model CMS.Models.UserAccount
+
+@{
+    ViewBag.Title = "Register";
+}
+
+<h2>Registation Page</h2>
+
+
+@using (Html.BeginForm("Registrar", "UserAccount", FormMethod.Post, new { ID = "userAccountForm" }))
+{
+    @Html.AntiForgeryToken()
+
+
+    <div class="form-horizontal">
+        <h5>Please register to use CMS services</h5>
+        <hr />
+        @Html.ValidationSummary(true)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Email, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Email, htmlAttributes: new { @class = "form-control" })
+
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Password, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Password, htmlAttributes: new { @type = "password", @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Log in" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+    <div id="message" style="color: red; font-weight: bold; margin-left: 100px;">@ViewBag.message</div>
+}
+
+
+
+@section Scripts {
+
+    <script src="~/Scripts/jquery-2.2.3.js"></script>
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            $("#userAccountForm").validate({
+                rules: {
+                    Email: {
+                        required: true,
+                        email: true,
+                    },
+                    Password: {
+                        required: true,
+                        minlength: 3,
+
+                    },
+                },
+                messages: {
+                    Email: {
+                        required: "Please provide an email.",
+                        email: "Please provide a valid email.",
+                    },
+                    Password: {
+                        required: "Please provide a Password",
+
+                    },
+                }
+            });
+
+            $('#message').delay(8000).fadeOut();
+
+
+        });
+    </script>
+}
+
+

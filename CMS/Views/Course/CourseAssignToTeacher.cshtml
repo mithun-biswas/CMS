@@ -1,0 +1,534 @@
+﻿@model CMS.Models.CourseTeacher
+@{
+    ViewBag.Title = "CourseAssignToTeacher";
+}
+
+<h2>CourseAssignToTeacher</h2>
+
+@using (Html.BeginForm("CourseAssignToTeacher", "Course", FormMethod.Post, new { @Id = "CourseAssignToTeacherForm" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Course Assign To Teacher</h4>
+        <hr />
+        @Html.ValidationSummary(true)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Teacher, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select class="form-control" id="Teacher" name="Teacher">
+                    <option value="">--Select a Teacher--</option>
+                    @foreach (var teacher in ViewBag.TeacherList)
+                    {
+                        <option value="@teacher.Id">@teacher.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.NumberOfCourse, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.NumberOfCourse, htmlAttributes: new
+                {
+                    @class = "form-control",
+                    @readonly = "readonly"
+                })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.RemainingCourse, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.RemainingCourse, htmlAttributes: new
+                {
+                    @class = "form-control",
+                    @readonly = "readonly"
+                })
+                
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CourseCode, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select class="form-control" id="CourseCode" name="CourseCode">
+                    <option value="">--Select a Course--</option>
+                    @foreach (var course in ViewBag.CourseList)
+                    {
+                        <option value="@course">@course</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CourseName, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.CourseName, htmlAttributes: new
+                {
+                    @class = "form-control",
+                    @readonly = "readonly"
+                })
+
+            </div>
+        </div>
+        
+        <div class="form-group">
+            @Html.LabelFor(model => model.Semester, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Semester, htmlAttributes: new
+                {
+                    @class = "form-control",
+                    @readonly = "readonly"
+                })
+
+            </div>
+        </div>
+        
+        <div class="form-group">
+            @Html.LabelFor(model => model.Section, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select class="form-control" id="Section" name="Section">
+                    <option value="">--Select a Section--</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.TimeId, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.TimeId, new SelectList(ViewBag.TimeList, "Id", "Description"), htmlAttributes:new{@class="form-control"})
+            </div>
+        </div>
+
+
+        <div id="TeacherTimeConflictDialog">
+              
+        </div>
+        
+        <div id="UpdateDialog">
+            This course is Already assign to <span id="assignedTeacherName"></span>. 
+            If you want the Update this course information click "Save". Otherwise click "Cancel"  
+        </div>
+        
+        <div id="remainingCourseDialog">
+            <span id="teacherNametoAssign"></span> have no remaining course to assign.
+             However, If you want the assign this course to him click "Save". Otherwise click "Cancel"
+        </div>
+        
+        <div id="sameTimeTwoSectionDialog">
+            <span id="courseNameSameSection"></span> have another section in the same time.
+            However, If you want to save this course anyway click "Save". Otherwise click "Cancel"
+        </div>
+
+        <div id="NoGapBetweenTwoCourseDialog">
+            if You assigned this course to the selected teacher then he has two consecutive course in the same day.
+            However, If you want to save this course anyway click "Save". Otherwise click "Cancel"
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" id="save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script src="~/Scripts/jquery-2.2.3.js"></script>
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery-ui-1.11.4.js"></script>
+    <link href="~/Content/themes/base/all.css" rel="stylesheet" />
+
+    <script>
+    $(document).ready(function() {
+
+
+        $('#TeacherTimeConflictDialog').dialog({
+            title: "Conflict Course Time warning!!!",
+            draggable: false,
+            dialogClass: "no-close",
+            width: 350,
+            height: 250,
+            resizable: false,
+            modal: true,
+            closeOnEscape: false,
+            autoOpen: false,
+            buttons: {
+                'Ok': function () {
+                    $('#TeacherTimeConflictDialog').empty();
+                    $('#TeacherTimeConflictDialog').dialog('close');
+                }
+            },
+
+        });
+
+
+
+
+
+        $('#UpdateDialog').dialog( {
+            title: "Update Teacher warning!!!",
+            draggable: false,
+            dialogClass: "no-close",
+            width: 350,
+            height: 250,
+            resizable: false,
+            modal: true,
+            closeOnEscape: false,
+            autoOpen: false,
+            buttons: {
+                'Save': function () {
+                    CheckIfNumberOfCoursesExceeded();
+                },
+                'Cancel': function() {
+                    $('#UpdateDialog').dialog('close');
+                },
+            },
+            
+        });
+
+        
+        
+
+
+        $('#remainingCourseDialog').dialog({
+            title: "Course limit exceed warning!!!",
+            draggable: false,
+            dialogClass: "no-close",
+            width: 350,
+            height: 250,
+            resizable: false,
+            modal: true,
+            closeOnEscape: false,
+            autoOpen: false,
+            buttons: {
+                'Save': function () {
+                    CheckIfAnotherSectionIsAssignedInSameTime();
+                },
+                'Cancel': function () {
+                    $('#remainingCourseDialog').dialog('close');
+                    $('#UpdateDialog').dialog('close');
+                },
+            },
+
+        });
+
+
+
+        $('#sameTimeTwoSectionDialog').dialog({
+            title: "Same Time two Section warning!!!",
+            draggable: false,
+            dialogClass: "no-close",
+            width: 350,
+            height: 250,
+            resizable: false,
+            modal: true,
+            closeOnEscape: false,
+            autoOpen: false,
+            buttons: {
+                'Save': function () {
+                    //document.getElementById('CourseAssignToTeacherForm').submit();
+                    CheckIfConsecutiveCoursesForSameTeacher();
+                },
+                'Cancel': function () {
+                    $('#sameTimeTwoSectionDialog').dialog('close');
+                    $('#remainingCourseDialog').dialog('close');
+                    $('#UpdateDialog').dialog('close');
+                },
+            },
+
+        });
+
+        $('#NoGapBetweenTwoCourseDialog').dialog({
+            title: "Cousecutive Course warning!!!",
+            draggable: false,
+            dialogClass: "no-close",
+            width: 350,
+            height: 250,
+            resizable: false,
+            modal: true,
+            closeOnEscape: false,
+            autoOpen: false,
+            buttons: {
+                'Save': function () {
+                    document.getElementById('CourseAssignToTeacherForm').submit();
+                },
+                'Cancel': function () {
+                    $('#NoGapBetweenTwoCourseDialog').dialog('close');
+                    $('#sameTimeTwoSectionDialog').dialog('close');
+                    $('#remainingCourseDialog').dialog('close');
+                    $('#UpdateDialog').dialog('close');
+                },
+            },
+
+        });
+
+
+
+
+        function CheckIfCourseIsAlreadyAssigned() {
+            var courseCode = $("#CourseCode").val();
+            var courseSection = $("#Section").val();
+            var json = { courseCode: courseCode, section:courseSection };
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CheckIfCourseIsAlreadyAssigned", "Course")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(json),
+                success: function (data) {
+
+                    if (data.toString() == "") {
+                        CheckIfNumberOfCoursesExceeded();
+                    } else {
+                      
+                        $("#assignedTeacherName").append(data.toString());
+                        $("#UpdateDialog").dialog('open');
+                    }
+                }
+            });
+        }
+
+
+
+        function CheckIfNumberOfCoursesExceeded() {
+
+            var remainingCourse = $('#RemainingCourse').val();
+            if (remainingCourse <= 0) {
+                var teacherName = $("#Teacher option:selected").text(); 
+                $('#teacherNametoAssign').append(teacherName);
+                $('#remainingCourseDialog').dialog('open');
+            } else {
+                CheckIfAnotherSectionIsAssignedInSameTime();
+            }
+        } 
+
+
+        function CheckIfAnotherSectionIsAssignedInSameTime() {
+            var courseCode = $("#CourseCode").val();
+            var courseSection = $("#Section").val();
+            var courseTime = $("#TimeId").val();
+            var json = { courseCode: courseCode, section: courseSection, time: courseTime };
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CheckIfAnotherSectionIsAssignedInSameTime", "Course")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(json),
+                success: function(data) {
+                    if (data.toString() == "") {
+                        CheckIfConsecutiveCoursesForSameTeacher();
+                    }
+                    $.each(data, function(key, value) {
+
+                        $("#courseNameSameSection").append(value.Name);
+                        $('#sameTimeTwoSectionDialog').dialog('open');
+                    });
+                    
+                }
+            });
+            
+        }
+
+
+
+        function CheckIfConsecutiveCoursesForSameTeacher()
+        {
+            var tId = $("#Teacher").val();
+            var timeId = $("#TimeId").val();
+            var courseCode = $('#CourseCode').val();
+            var section = $('#Section').val();
+            var json = { teacherId : tId, timeId: timeId, code: courseCode, section: section };
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CheckIfConsecutiveCoursesForSameTeacher", "Course")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(json),
+                success: function (data) {
+                    if (data.toString() == "") {
+                        document.getElementById('CourseAssignToTeacherForm').submit();
+                    } else {
+                        $('#NoGapBetweenTwoCourseDialog').dialog('open');
+                    }
+                    
+                }
+            });
+        }
+
+
+        function CheckIfTwoCourseInSameTimeForSelectedTeacher() {
+            var tId = $("#Teacher").val();
+            var timeId = $("#TimeId").val();
+            var json = { teacherId: tId, timeId: timeId };
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("CheckIfTwoCourseInSameTimeForSelectedTeacher", "Course")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(json),
+                success: function (data) {
+                    if (data.toString() == "") {
+                        CheckIfCourseIsAlreadyAssigned();
+                        
+                    } else {
+                        $("#TeacherTimeConflictDialog").append(data.toString());
+                        $('#TeacherTimeConflictDialog').dialog('open');
+                    }
+                }
+            });
+        }
+
+
+
+        //$('#CourseAssignToTeacherForm').click(function (e) {
+        $('#CourseAssignToTeacherForm').submit(function (e) {
+            e.preventDefault();
+            CheckIfTwoCourseInSameTimeForSelectedTeacher();
+        });
+
+
+
+
+
+        $("#CourseAssignToTeacherForm").validate({
+                rules: {
+                    Teacher: "required",
+                    NumberOfCourse: {
+                        required: true
+                    },
+                    RemainingCourse: {
+                        required: true
+                    },
+                    CourseCode: {
+                        required: true
+                    },
+                    CourseName: {
+                        required: true
+                    },
+                    Semester: {
+                        required: true
+                    },
+                    Section: {
+                        required: true
+                    },
+                    TimeId: {
+                        required: true
+                    }
+
+                },
+                messages: {
+
+                }
+            });
+
+
+            $("#Teacher").change(function() {
+           
+                var tId = $("#Teacher").val();
+                var json = { teacherId: tId };
+
+                $("#NumberOfCourse").empty();
+                $("#RemainingCourse").empty();
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GetNumberOfCourseAndReamingCourseByTeacherId", "Course")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(json),
+                    success: function(data) {
+
+                        $.each(data, function(key, value) {
+
+                            $("#NumberOfCourse").val(value.NumberOfCourse);
+                            $("#RemainingCourse").val(value.ReaminingCourse);
+                        });
+                    }
+                });
+            });
+
+            $("#CourseCode").change(function() {
+
+                var courseCodeValue = $("#CourseCode").val();
+
+                var json = { courseCode: courseCodeValue };
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("GetCourseNameSemesterSectionbyCourseCode", "Course")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(json),
+                    success: function(data) {
+                        $("#CourseName").empty();
+                        $("#Semester").empty();
+                        $("#Section").empty();
+                        var count = 0;
+                        $.each(data, function(key, value) {
+                            if (count == 0) {
+                                $("#CourseName").val(value.CourseName);
+                                $("#Semester").val(value.Semester);
+                                count++;
+                            }
+                            $("#Section").append('<option value="' + value.Section + '">' + value.Section + '</option>');
+                        });
+
+
+//$('#CourseId').empty();
+                        //$('#CourseId').append('<option value="">--Select a Student--</option>');
+                        //$.each(data, function (key, value) {
+                        //    $('#CourseId').append('<option value="'+value.Id+'">'+value.Name+'</option>');
+                        //});
+                    }
+                });
+
+            });
+
+
+        $("#TimeId").change(function () {
+
+            var courseCodeValue = $("#CourseCode").val();
+
+            var json = { courseCode: courseCodeValue };
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("GetCourseNameSemesterSectionbyCourseCode", "Course")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(json),
+                success: function (data) {
+                    $("#CourseName").empty();
+                    $("#Semester").empty();
+                    $("#Section").empty();
+                    var count = 0;
+                    $.each(data, function (key, value) {
+                        if (count == 0) {
+                            $("#CourseName").val(value.CourseName);
+                            $("#Semester").val(value.Semester);
+                            count++;
+                        }
+                        $("#Section").append('<option value="' + value.Section + '">' + value.Section + '</option>');
+                    });
+
+
+                    //$('#CourseId').empty();
+                    //$('#CourseId').append('<option value="">--Select a Student--</option>');
+                    //$.each(data, function (key, value) {
+                    //    $('#CourseId').append('<option value="'+value.Id+'">'+value.Name+'</option>');
+                    //});
+                }
+            });
+
+        });
+
+
+
+
+        });
+    
+    </script>
+
+}

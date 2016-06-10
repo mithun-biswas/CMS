@@ -1,0 +1,127 @@
+﻿@using CMS.Models
+@model CMS.Models.TeacherCourseAllInfoViewModel
+
+@{
+    ViewBag.Title = "Details";
+    int count = 1;
+    List<TeachersCourseListViewModel> courseList = Model.CourseList;
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Teacher</h4>
+    <hr />
+    <div class="form-group">
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Teacher.Name)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Teacher.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Teacher.ShortName)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Teacher.ShortName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Teacher.Email)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Teacher.Email, new {@class = "form-control" })
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Teacher.ContactNo)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Teacher.ContactNo)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Teacher.Designation)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Teacher.Designation)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Teacher.NumberOfCourse)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Teacher.NumberOfCourse)
+            </dd>
+
+        </dl>    
+    </div>
+    
+</div>
+
+
+<div class="form-group">
+    <div >
+        <table class="table" id="courseInformation">
+            <tr>
+                <th>
+                    @Html.DisplayName("SerialNo")
+                </th>
+                <th>
+                    @Html.DisplayName("Course Code")
+                </th>
+                <th>
+                    @Html.DisplayName("Course Name")
+                </th>
+                <th>
+                    @Html.DisplayName("Section")
+                </th>
+                <th>
+                    @Html.DisplayName("Time")
+                </th>
+            </tr>
+                        
+            @foreach (var course in courseList)
+            {
+                <tr>
+                    <th>
+                        @count
+                    </th>
+                    <th>
+                        @course.CourseCode
+                    </th>
+                    <th>
+                        @course.CourseName
+                    </th>
+                    <th>
+                        @course.Section
+                    </th>
+                    <th>
+                        @course.Time 
+                    </th>
+                </tr>   
+                
+                count++;
+            }
+            
+        </table>
+    </div>
+</div>
+
+
+
+
+
+
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Teacher.Id }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
