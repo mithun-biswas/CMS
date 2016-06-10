@@ -31,10 +31,17 @@ namespace CMS.Controllers
             }
             if (Session["user_email"] != null)
             {
-                return RedirectToAction("Create", "Teacher");
+                return RedirectToAction("Index", "Home");
             }
             ViewBag.message = "Email or Password is incorrect!!!";
             return View(user);    
+        }
+
+        public ActionResult Logout()
+        {
+            Session["user_id"] = null;
+            Session["user_email"] = null;            
+            return RedirectToAction("Index", "Home");
         }
 
         //// GET: /UserAccount/Create
