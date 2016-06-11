@@ -346,7 +346,6 @@
     <Content Include="Views\Teacher\PartTimeFacultyCourseLoadReport.cshtml" />
     <Content Include="Views\Teacher\PartTimeFacultyCourseLoadReportExcel.cshtml" />
     <Content Include="Views\SendMailer\Index.cshtml" />
-    <Content Include="Views\Teacher\SendEmailPDF.cshtml" />
     <Content Include="Views\Teacher\TeacherDetailsPDF.cshtml" />
   </ItemGroup>
   <ItemGroup>

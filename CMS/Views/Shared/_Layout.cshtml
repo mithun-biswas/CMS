@@ -18,6 +18,11 @@
             height: 5%;
             font-family: Fira Sans;
         }
+        .navbar-brand{
+            font-size: 22px;
+            font-style: italic;
+            font-weight: bold;
+        }
     </style>
 
 </head>
@@ -62,8 +67,8 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Report <b class="caret"></b></a>
                             <ul class="dropdown-menu">
 
-                                <li>@Html.ActionLink("H&R Report for Full-Time Faculty", "FullTimeFacultyCourseLoad", "Teacher")</li>
-                                <li>@Html.ActionLink("H&R Report for Part-Time Faculty", "PartTimeFacultyCourseLoad", "Teacher")</li>
+                                <li>@Html.ActionLink("Full-Time Faculty", "FullTimeFacultyCourseLoad", "Teacher")</li>
+                                <li>@Html.ActionLink("Part-Time Faculty", "PartTimeFacultyCourseLoad", "Teacher")</li>
                                 <li>@Html.ActionLink("Registrar Report", "RegistrarReport", "Course")</li>
                             </ul>
                         </li>
