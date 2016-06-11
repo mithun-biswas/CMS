@@ -16,6 +16,7 @@ using OfficeOpenXml;
 using System.IO;
 using System.Net.Mail;
 using System.Net.Mime;
+using System.Net.Mail;
 
 namespace CMS.Controllers
 {
@@ -725,10 +726,17 @@ namespace CMS.Controllers
             MemoryStream s = new MemoryStream(output.ToArray());
             s.Seek(0, SeekOrigin.Begin);
             Attachment a = new Attachment(s, "FullTimeFaculty.pdf");
+
             MailMessage message = new MailMessage("nuha.khan4@gmail.com", EmailToTeacher,
    "Report - Your Course Details!", "Here is a report of your course Details");
             message.Attachments.Add(a);
             SmtpClient client = new SmtpClient();
+            client.Host = "smtp.gmail.com";
+            client.Port = 587;
+            client.UseDefaultCredentials = false;
+            client.Credentials = new System.Net.NetworkCredential
+            ("nuha.khan4@gmail.com", "Fui Tui 9*");// Enter seders User name and password  
+            client.EnableSsl = true;            
             client.Send(message);
 
             TeacherCourseAllInfoViewModel teacherCourse = new TeacherCourseAllInfoViewModel();
