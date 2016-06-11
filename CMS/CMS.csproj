@@ -167,6 +167,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CourseController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\SendMailerController.cs" />
     <Compile Include="Controllers\TeacherController.cs" />
     <Compile Include="Controllers\UserAccountController.cs" />
     <Compile Include="Global.asax.cs">
@@ -220,6 +221,7 @@
     <Compile Include="Models\CourseTeacher.cs" />
     <Compile Include="Models\Designation.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\MailModel.cs" />
     <Compile Include="Models\Semester.cs" />
     <Compile Include="Models\Teacher.cs" />
     <Compile Include="Models\TeacherCourseAllInfoViewModel.cs" />
@@ -343,6 +345,9 @@
     <Content Include="Views\Teacher\FullTimeFacultyCourseLoadReportExcel.cshtml" />
     <Content Include="Views\Teacher\PartTimeFacultyCourseLoadReport.cshtml" />
     <Content Include="Views\Teacher\PartTimeFacultyCourseLoadReportExcel.cshtml" />
+    <Content Include="Views\SendMailer\Index.cshtml" />
+    <Content Include="Views\Teacher\SendEmailPDF.cshtml" />
+    <Content Include="Views\Teacher\TeacherDetailsPDF.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

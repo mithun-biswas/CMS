@@ -44,17 +44,18 @@
  </div>
 
 
+<div>
+    @Html.ActionLink("Download PDF", "PartTimeFacultyCourseLoadReport")
+</div>
+
+<div>
+    @Html.ActionLink("Download Excel", "PartTimeFacultyCourseLoadReportExcel")
+</div>
 
 
-    <div>
-        @Html.ActionLink("Get PDF", "PartTimeFacultyCourseLoadReport")
-    </div>
 
-    <div>
-        @Html.ActionLink("Get Excel", "PartTimeFacultyCourseLoadReportExcel")
-    </div>
 
-    <a href="#" onclick="return xepOnline.Formatter.Format('PartTime',{render:'download'});">
+    @*<a href="#" onclick="return xepOnline.Formatter.Format('PartTime',{render:'download'});">
         Save as PDF (With Script)
     </a>
 
@@ -63,4 +64,4 @@
         <script type="text/javascript" src="~/Scripts/jquery-2.2.3.js"></script>
         <script src="~/Scripts/xepOnline.jqPlugin.js"></script>
 
-    }
+    }*@

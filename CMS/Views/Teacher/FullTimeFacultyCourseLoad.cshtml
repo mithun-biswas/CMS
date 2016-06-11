@@ -43,6 +43,18 @@
     </table>
 </div>
 
+<div>
+    @Html.ActionLink("Download PDF", "FullTimeFacultyCourseLoadReport")
+</div>
+
+<div>
+    @Html.ActionLink("Download Excel", "FullTimeFacultyCourseLoadReportExcel")
+</div>
+
+
+
+
+
 
 @*<a href="javascript:genPDF()">Download pdf</a>
 <button onclick="printContent('customers')">Print Content</button>
@@ -73,18 +85,16 @@
 }*@
 
 
-<div>
-    @Html.ActionLink("Get PDF", "FullTimeFacultyCourseLoadReport")
-</div>
 
 
-<div>
-    @Html.ActionLink("Get Excel", "FullTimeFacultyCourseLoadReportExcel")
-</div>
 
 
-<div>
 
+@*<div>
+    @Html.ActionLink("Send PDF via Email", "SendEmailPDF")
+</div>*@
+
+@*<div>
     <a href="#" onclick="return xepOnline.Formatter.Format('FullTime',{render:'download'});">
         Save as PDF (With Script)
     </a>
@@ -95,6 +105,4 @@
         <script src="~/Scripts/xepOnline.jqPlugin.js"></script>
 
     }
-
-
-</div>
+</div>*@
